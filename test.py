@@ -1,8 +1,8 @@
 # documentation here
 
-# import image for notes
+
 # hollow image for note to fit in
-# scrollling notes right to Left
+
 # frequency range associated with the 5 notes
 # if you are within the frequency range, you score the points
 # point system
@@ -13,14 +13,40 @@ import random
 import math
 from time import sleep
 from pygame.locals import *
+import csv
+from csv import DictReader
+import time
+
+
+
 
 pygame.init()
 pygame.display.set_caption("Brain Hero")
 screen = pygame.display.set_mode((1400, 600))
-
+rect_hit_note1 = pygame.Rect(397,185,5,30)
+rect_hit_note2 = pygame.Rect(397,215,5,30)
+rect_hit_note3 = pygame.Rect(397,245,5,30)
+rect_hit_note4 = pygame.Rect(397,275,5,30)
+rect_hit_note5 = pygame.Rect(397,305,5,30)
 
 missed_note = pygame.mixer.Sound('sounds/missed_note.wav')
 #pygame.mixer.Sound.play(missed_note)
+
+read_obj = csv.reader(open('Data/data.csv', 'r'))
+def readData(read_obj):
+
+    for row in read_obj:
+        for x in row:
+            if 15 <= abs(int(float(x))) <= 30:
+                pygame.draw.rect(screen, RED, rect)
+            elif 30 < abs(int(float(x))) <= 45:
+                return 4
+            elif 45 < abs(int(float(x))) <= 60:
+                return 3
+            elif 60 < abs(int(float(x))) <= 75:
+                return 2
+            elif 75 < abs(int(float(x))):
+                return 1
 
 # plays a curated song
 def playSong():
@@ -37,6 +63,7 @@ def text_objects(text, font):
 def keysimg(x, y):
     keyimg = pygame.image.load('images/blue_line.png')
     keyimg1 = pygame.transform.scale(keyimg, (300,300))
+
     return screen.blit(keyimg1, (x,y))
 
 def keysimg2(x, y):
@@ -59,6 +86,7 @@ def keysimg5(x, y):
     keyimg5_1 = pygame.transform.scale(keyimg5, (300,300))
     return screen.blit(keyimg5_1, (x,y))
 
+
 # randomizes y coordinate for image
 def yCoor():
     full_chord = random.randint(1,5)
@@ -77,7 +105,17 @@ def yCoor():
     else:
         return 230
 
-
+def collision_detect(x):
+    if x.colliderect(rect):
+        pygame.draw.rect(screen, GRAY, rect)
+    elif x.colliderect(rect2):
+        pygame.draw.rect(screen, GRAY, rect2)
+    elif x.colliderect(rect3):
+        pygame.draw.rect(screen, GRAY, rect3)
+    elif x.colliderect(rect4):
+        pygame.draw.rect(screen, GRAY, rect4)
+    elif x.colliderect(rect5):
+        pygame.draw.rect(screen, GRAY, rect5)
 
 # starting screen
 def game_intro():
@@ -148,6 +186,13 @@ keyY4 = yCoor()
 keyX5 = 2700
 keyY5 = yCoor()
 
+RED = (255, 0, 0)
+GRAY =(0, 0, 0)
+
+
+
+
+v = [-10, 0]
 
 game_intro()
 #playSong()
@@ -161,41 +206,106 @@ while open:
             open = False
     screen.fill((0, 0, 0))
 
-    keyX -= 12.5
-    keyX2 -= 12.5
-    keyX3 -= 12.5
-    keyX4 -= 12.5
-    keyX5 -= 12.5
+    readData(read_obj)
+
+    keyX -= 10
+    keyX2 -= 10
+    keyX3 -= 10
+    keyX4 -= 10
+    keyX5 -= 10
     screen.blit(pygame.transform.scale(pygame.image.load('images/play_game_background.png'), (1400,600)), (0, 0))
+
     keysimg(keyX,keyY)
+    rect = pygame.Rect(keyX, (keyY+60), 300, 30)
+    rect.move_ip(v)
+
+
     keysimg2(keyX2,keyY2)
+    rect2 = pygame.Rect(keyX2, (keyY2+60), 300, 30)
+    rect2.move_ip(v)
+    pygame.draw.rect(screen, RED, rect2)
+
     keysimg3(keyX3,keyY3)
+    rect3 = pygame.Rect(keyX3, (keyY3+60), 300, 30)
+    rect3.move_ip(v)
+    pygame.draw.rect(screen, RED, rect3)
+
     keysimg4(keyX4,keyY4)
+    rect4 = pygame.Rect(keyX4, (keyY4+60), 300, 30)
+    rect4.move_ip(v)
+    pygame.draw.rect(screen, RED, rect4)
+
     keysimg5(keyX5,keyY5)
+    rect5 = pygame.Rect(keyX5, (keyY5+60), 300, 30)
+    rect5.move_ip(v)
+    pygame.draw.rect(screen, RED, rect5)
+
+    pygame.draw.rect(screen, RED, rect_hit_note1)
+    pygame.draw.rect(screen, RED, rect_hit_note2)
+    pygame.draw.rect(screen, RED, rect_hit_note3)
+    pygame.draw.rect(screen, RED, rect_hit_note4)
+    pygame.draw.rect(screen, RED, rect_hit_note5)
+
     if keyX == -250:
         keyX = 1400
         keyY = yCoor()
         keysimg(keyX, keyY)
+
+    if rect.right < 0:
+        rect.left = 1400
+    pygame.display.flip()
+    pygame.display.update()
 
     if keyX2 == -250:
         keyX2 = 1400
         keyY2 = yCoor()
         keysimg2(keyX2, keyY2)
 
+    if rect2.right < 0:
+        rect2.left = 1400
+    pygame.display.flip()
+    pygame.display.update()
+
     if keyX3 == -250:
         keyX3 = 1400
         keyY3 = yCoor()
         keysimg3(keyX3,keyY3)
+
+    if rect3.right < 0:
+        rect3.left = 1400
+    pygame.display.flip()
+    pygame.display.update()
 
     if keyX4 == -250:
         keyX4 = 1400
         keyY4 = yCoor()
         keysimg4(keyX4,keyY4)
 
+    if rect4.right < 0:
+        rect4.left = 1400
+    pygame.display.flip()
+    pygame.display.update()
+
+
     if keyX5 == -250:
         keyX5 = 1400
         keyY5 = yCoor()
         keysimg5(keyX5,keyY5)
+
+    if rect5.right < 0:
+        rect5.left = 1400
+    pygame.display.flip()
+    pygame.display.update()
+
+    collision_detect(rect_hit_note1)
+    collision_detect(rect_hit_note2)
+    collision_detect(rect_hit_note3)
+    collision_detect(rect_hit_note4)
+    collision_detect(rect_hit_note5)
+
+
+
+
 
 
     pygame.display.update()
